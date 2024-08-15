@@ -1,5 +1,7 @@
+use actix_files as fs;
 use actix_web::{web, App, HttpServer, Responder, HttpResponse};
 use serde::Deserialize;
+use std::path::PathBuf;
 
 #[derive(Deserialize)]
 struct AgeRequest {
@@ -19,6 +21,9 @@ async fn check_license(data: web::Json<AgeRequest>) -> impl Responder {
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
+            // Serve the static files located in the "static" folder
+            .service(fs::Files::new("/", "./static").index_file("index.html"))
+            // API endpoint
             .route("/check-license", web::post().to(check_license))
     })
     .bind(("127.0.0.1", 8080))?
